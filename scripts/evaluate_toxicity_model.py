@@ -67,12 +67,20 @@ def main() -> None:
         vector_size=word2vec_model.vector_size,
         batch_size=args.batch_size,
     )
-    metrics = _calculate_metrics(
-        labels=val_labels,
-        scores=scores,
-        threshold=args.threshold,
-    )
-    _print_metrics(metrics)
+    if args.thresholds:
+        threshold_metrics = _calculate_metrics_by_threshold(
+            labels=val_labels,
+            scores=scores,
+            thresholds=args.thresholds,
+        )
+        _print_threshold_comparison(threshold_metrics)
+    else:
+        metrics = _calculate_metrics(
+            labels=val_labels,
+            scores=scores,
+            threshold=args.threshold,
+        )
+        _print_metrics(metrics)
 
 
 def _parse_args() -> argparse.Namespace:
@@ -92,6 +100,12 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--val-size", type=float, default=0.1, help="validation 비율")
     parser.add_argument("--random-state", type=int, default=42, help="랜덤 시드")
     parser.add_argument("--threshold", type=float, default=0.5, help="예측 threshold")
+    parser.add_argument(
+        "--thresholds",
+        type=float,
+        nargs="+",
+        help="비교할 threshold 목록. 지정하면 한 번 학습한 score로 threshold별 지표를 출력합니다.",
+    )
     return parser.parse_args()
 
 
@@ -222,12 +236,29 @@ def _calculate_metrics(
     threshold: float,
 ) -> dict[str, float]:
     predictions = (scores >= threshold).astype(np.float32)
+
+    # roc_auc: threshold와 관계없이 전체 분류 성능을 본다. 0.5는 랜덤, 1.0은 완벽이다.
+    # f1: precision과 recall의 조화 평균이다. 둘 중 하나라도 낮으면 점수가 낮아진다.
+    # accuracy: 전체 샘플 중 맞춘 비율이다. 데이터 불균형이 있으면 misleading할 수 있다.
+    # precision: toxic이라고 예측한 것 중 실제 toxic 비율이다.
+    # recall: 실제 toxic 중 모델이 잡아낸 비율이다.
     return {
         "roc_auc": _safe_roc_auc(labels, scores),
         "f1": f1_score(labels, predictions, zero_division=0),
         "accuracy": accuracy_score(labels, predictions),
         "precision": precision_score(labels, predictions, zero_division=0),
         "recall": recall_score(labels, predictions, zero_division=0),
+    }
+
+
+def _calculate_metrics_by_threshold(
+    labels: np.ndarray,
+    scores: np.ndarray,
+    thresholds: list[float],
+) -> dict[float, dict[str, float]]:
+    return {
+        threshold: _calculate_metrics(labels, scores, threshold)
+        for threshold in thresholds
     }
 
 
@@ -262,6 +293,17 @@ def _print_metrics(metrics: dict[str, float]) -> None:
     print("[Evaluation Result]")
     for metric_name, metric_value in metrics.items():
         print(f"{metric_name}: {metric_value:.4f}")
+
+
+def _print_threshold_comparison(
+    threshold_metrics: dict[float, dict[str, float]],
+) -> None:
+    print("[Threshold Comparison]")
+    for threshold, metrics in threshold_metrics.items():
+        print()
+        print(f"threshold={threshold:.2f}")
+        for metric_name, metric_value in metrics.items():
+            print(f"{metric_name}: {metric_value:.4f}")
 
 
 if __name__ == "__main__":

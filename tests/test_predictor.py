@@ -9,6 +9,13 @@ from gensim.models import Word2Vec
 from src.moderation.model import GRUModel
 from src.moderation.predictor import ToxicityPredictor
 
+SAMPLE_COMMENTS = [
+    "오늘 날씨 좋다",
+    "너 진짜 최악이다",
+    "asdf qwer zxcv",
+    "",
+]
+
 
 class MockEmbeddingModel:
     def __init__(self) -> None:
@@ -81,6 +88,27 @@ def test_from_artifacts_loads_artifacts_and_predicts(tmp_path: Path) -> None:
     assert result["label"] in {"toxic", "non-toxic"}
     assert isinstance(result["score"], float)
     assert 0.0 <= result["score"] <= 1.0
+
+
+def test_from_artifacts_predicts_sample_comments(tmp_path: Path) -> None:
+    _save_word2vec_artifact(tmp_path)
+    model = GRUModel(input_size=3, hidden_size=5, num_layers=1)
+    torch.save(model.state_dict(), tmp_path / "best_model.pth")
+    _save_model_config(
+        tmp_path,
+        input_size=3,
+        hidden_size=5,
+        num_layers=1,
+    )
+
+    predictor = ToxicityPredictor.from_artifacts(tmp_path)
+
+    for comment in SAMPLE_COMMENTS:
+        result = predictor.predict(comment)
+        assert set(result) == {"label", "score"}
+        assert result["label"] in {"toxic", "non-toxic"}
+        assert isinstance(result["score"], float)
+        assert 0.0 <= result["score"] <= 1.0
 
 
 def test_predict_returns_label_and_score() -> None:
