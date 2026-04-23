@@ -26,7 +26,21 @@
 
 ## 검증 방법 (How to test)
 
+### 실행한 테스트
+
+* [ ] focused test 실행
+* [ ] related module test 실행
+* [ ] full test suite 실행
+* [ ] manual check 실행
+* [ ] 실행하지 못한 테스트가 있다면 이유를 작성했다
+
+### 테스트 명령
+
 ```bash
+# 예시
+pytest tests/test_preprocessing.py
+pytest tests/test_predictor.py
+pytest
 python scripts/predict_comment.py
 ```
 
@@ -34,8 +48,9 @@ python scripts/predict_comment.py
 
 * [ ] 정상 입력
 * [ ] 빈 문자열
+* [ ] invalid input
 * [ ] OOV-only 입력
-* [ ] 잘못된 입력
+* [ ] missing files/artifacts
 
 ---
 

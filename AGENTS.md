@@ -76,15 +76,37 @@ Do NOT:
 
 ## Testing Rules
 
+* Always validate a function immediately after implementing or modifying it.
+* Do not implement multiple functions before running tests.
+* If a focused test fails, fix it before moving to the next function.
 * Test logic at the function level where possible.
+* Write or update tests whenever adding or changing a function with meaningful logic.
+* Test one function or module at a time before moving to the next implementation step.
 * Cover edge cases:
 
   * empty input
-  * OOV-only input
   * invalid input
-  * missing artifact files
+  * OOV-only input
+  * missing files or missing artifacts
 * Prefer small focused tests over large end-to-end-only tests.
 * If a function is hard to test, simplify or split it.
+* Prefer pytest for automated tests.
+* Add pytest as a dependency when the first test file is introduced.
+* Use this workflow after each meaningful change:
+
+  1. run focused test for the changed function
+  2. fix issues if the test fails
+  3. run related module tests
+  4. run the full test suite
+* If a test cannot be run, clearly explain why and what was checked instead.
+
+Recommended commands:
+
+```bash
+pytest tests/test_preprocessing.py
+pytest tests/test_predictor.py
+pytest
+```
 
 ---
 
