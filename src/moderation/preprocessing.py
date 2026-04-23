@@ -7,7 +7,8 @@ def clean_text(text: str) -> str:
         raise TypeError("text는 문자열이어야 합니다.")
 
     normalized_text = text.replace("\n", " ").lower()
-    cleaned_text = re.sub(r"[^a-z0-9\s]", "", normalized_text)
+    normalized_text = normalized_text.replace("_", " ")
+    cleaned_text = re.sub(r"[^가-힣ㄱ-ㅎㅏ-ㅣa-z0-9\s]", "", normalized_text)
     return " ".join(cleaned_text.split())
 
 
