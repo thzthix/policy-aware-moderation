@@ -1,14 +1,18 @@
 import numpy as np
 
 
-def tokens_to_sequence_vectors(tokens: list[str], model) -> np.ndarray:
+def tokens_to_sequence_vectors(
+    tokens: list[str],
+    model,
+    oov_token: str = "OOV",
+) -> np.ndarray:
     """토큰 목록을 벡터 시퀀스로 변환한다."""
     vector_size = model.vector_size
 
     if not tokens:
         return np.zeros((1, vector_size), dtype=np.float32)
 
-    vectors = [_get_token_vector(token, model) for token in tokens]
+    vectors = [_get_token_vector(token, model, oov_token) for token in tokens]
     sequence_vectors = np.vstack(vectors)
     return np.nan_to_num(sequence_vectors, nan=0.0).astype(np.float32, copy=False)
 
@@ -35,10 +39,10 @@ def pad_sequence_vectors(sequences: list[np.ndarray], vector_size: int) -> np.nd
     return batch_vectors
 
 
-def _get_token_vector(token: str, model) -> np.ndarray:
-    vector_key = token if token in model.key_to_index else "OOV"
+def _get_token_vector(token: str, model, oov_token: str) -> np.ndarray:
+    vector_key = token if token in model.key_to_index else oov_token
     if vector_key not in model.key_to_index:
-        raise ValueError("임베딩 모델에 OOV 벡터가 없습니다.")
+        raise ValueError("임베딩 모델에 OOV 토큰 벡터가 없습니다.")
 
     vector = np.asarray(model[vector_key], dtype=np.float32)
     if vector.shape != (model.vector_size,):
