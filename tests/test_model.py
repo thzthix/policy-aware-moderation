@@ -46,3 +46,30 @@ def test_gru_model_rejects_non_float32_input() -> None:
 
     with pytest.raises(TypeError):
         model(inputs)
+
+
+def test_gru_model_accepts_sentence_features() -> None:
+    model = GRUModel(input_size=3, hidden_size=5, num_layers=1, feature_size=4)
+    inputs = torch.randn(2, 4, 3, dtype=torch.float32)
+    sentence_features = torch.randn(2, 4, dtype=torch.float32)
+
+    outputs = model(inputs, sentence_features=sentence_features)
+
+    assert outputs.shape == (2, 1)
+
+
+def test_gru_model_requires_sentence_features_when_configured() -> None:
+    model = GRUModel(input_size=3, hidden_size=5, num_layers=1, feature_size=4)
+    inputs = torch.randn(2, 4, 3, dtype=torch.float32)
+
+    with pytest.raises(ValueError):
+        model(inputs)
+
+
+def test_gru_model_rejects_sentence_features_for_baseline_model() -> None:
+    model = GRUModel(input_size=3, hidden_size=5, num_layers=1)
+    inputs = torch.randn(2, 4, 3, dtype=torch.float32)
+    sentence_features = torch.randn(2, 4, dtype=torch.float32)
+
+    with pytest.raises(ValueError):
+        model(inputs, sentence_features=sentence_features)

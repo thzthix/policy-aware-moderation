@@ -40,11 +40,16 @@ def pad_sequence_vectors(sequences: list[np.ndarray], vector_size: int) -> np.nd
 
 
 def _get_token_vector(token: str, model, oov_token: str) -> np.ndarray:
-    vector_key = token if token in model.key_to_index else oov_token
-    if vector_key not in model.key_to_index:
-        raise ValueError("임베딩 모델에 OOV 토큰 벡터가 없습니다.")
+    if token in model.key_to_index:
+        vector = np.asarray(model[token], dtype=np.float32)
+    elif oov_token in model.key_to_index:
+        vector = np.asarray(model[oov_token], dtype=np.float32)
+    else:
+        try:
+            vector = np.asarray(model[token], dtype=np.float32)
+        except KeyError as error:
+            raise ValueError("임베딩 모델에 OOV 토큰 벡터가 없습니다.") from error
 
-    vector = np.asarray(model[vector_key], dtype=np.float32)
     if vector.shape != (model.vector_size,):
         raise ValueError("임베딩 벡터 크기가 model.vector_size와 다릅니다.")
 

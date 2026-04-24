@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import json
 from pathlib import Path
 
 import numpy as np
 import pytest
 import torch
-from gensim.models import Word2Vec
+from gensim.models import FastText, Word2Vec
 
 from src.moderation.model import GRUModel
 from src.moderation.predictor import ToxicityPredictor
@@ -35,14 +37,20 @@ class MockModel:
     def __init__(self, logit: float) -> None:
         self.logit = logit
         self.received_input: torch.Tensor | None = None
+        self.received_sentence_features: torch.Tensor | None = None
         self.is_eval = False
         self.grad_enabled: bool | None = None
 
     def eval(self) -> None:
         self.is_eval = True
 
-    def __call__(self, inputs: torch.Tensor) -> torch.Tensor:
+    def __call__(
+        self,
+        inputs: torch.Tensor,
+        sentence_features: torch.Tensor | None = None,
+    ) -> torch.Tensor:
         self.received_input = inputs
+        self.received_sentence_features = sentence_features
         self.grad_enabled = torch.is_grad_enabled()
         return torch.tensor([[self.logit]], dtype=torch.float32)
 
@@ -111,6 +119,45 @@ def test_from_artifacts_predicts_sample_comments(tmp_path: Path) -> None:
         assert 0.0 <= result["score"] <= 1.0
 
 
+def test_from_artifacts_uses_sentence_features_when_configured(tmp_path: Path) -> None:
+    _save_word2vec_artifact(tmp_path)
+    model = GRUModel(input_size=3, hidden_size=5, num_layers=1, feature_size=4)
+    torch.save(model.state_dict(), tmp_path / "best_model.pth")
+    _save_model_config(
+        tmp_path,
+        input_size=3,
+        hidden_size=5,
+        num_layers=1,
+        use_sentence_features=True,
+        sentence_feature_size=4,
+    )
+
+    predictor = ToxicityPredictor.from_artifacts(tmp_path)
+    result = predictor.predict("hello toxic ㅋㅋ")
+
+    assert predictor.use_sentence_features is True
+    assert set(result) == {"label", "score"}
+
+
+def test_from_artifacts_loads_fasttext_artifact(tmp_path: Path) -> None:
+    _save_fasttext_artifact(tmp_path)
+    model = GRUModel(input_size=3, hidden_size=5, num_layers=1)
+    torch.save(model.state_dict(), tmp_path / "best_model.pth")
+    _save_model_config(
+        tmp_path,
+        input_size=3,
+        hidden_size=5,
+        num_layers=1,
+        embedding_type="fasttext",
+    )
+
+    predictor = ToxicityPredictor.from_artifacts(tmp_path)
+    result = predictor.predict("hello toxic")
+
+    assert set(result) == {"label", "score"}
+    assert 0.0 <= result["score"] <= 1.0
+
+
 def test_predict_returns_label_and_score() -> None:
     model = MockModel(logit=2.0)
     predictor = ToxicityPredictor(
@@ -128,6 +175,7 @@ def test_predict_returns_label_and_score() -> None:
     assert model.grad_enabled is False
     assert model.received_input is not None
     assert model.received_input.dtype == torch.float32
+    assert model.received_sentence_features is None
 
 
 def test_predict_uses_threshold_for_toxic_label() -> None:
@@ -156,6 +204,20 @@ def test_predict_uses_threshold_for_non_toxic_label() -> None:
     assert result["score"] < 0.5
 
 
+def test_predict_passes_sentence_features_when_enabled() -> None:
+    model = MockModel(logit=0.0)
+    predictor = ToxicityPredictor(
+        embedding_model=MockEmbeddingModel(),
+        model=model,
+        use_sentence_features=True,
+    )
+
+    predictor.predict("hello ㅋㅋ toxic")
+
+    assert model.received_sentence_features is not None
+    assert model.received_sentence_features.shape == (1, 4)
+
+
 def _save_word2vec_artifact(artifact_dir: Path, oov_token: str = "OOV") -> None:
     word2vec_model = Word2Vec(
         sentences=[["hello", "toxic"], [oov_token, "hello"]],
@@ -167,12 +229,26 @@ def _save_word2vec_artifact(artifact_dir: Path, oov_token: str = "OOV") -> None:
     word2vec_model.save(str(artifact_dir / "word2vec.model"))
 
 
+def _save_fasttext_artifact(artifact_dir: Path, oov_token: str = "OOV") -> None:
+    fasttext_model = FastText(
+        sentences=[["hello", "toxic"], [oov_token, "hello"]],
+        vector_size=3,
+        min_count=1,
+        workers=1,
+        seed=42,
+    )
+    fasttext_model.save(str(artifact_dir / "fasttext.model"))
+
+
 def _save_model_config(
     artifact_dir: Path,
     input_size: int,
     hidden_size: int,
     num_layers: int,
     oov_token: str = "OOV",
+    use_sentence_features: bool = False,
+    sentence_feature_size: int = 0,
+    embedding_type: str = "word2vec",
 ) -> None:
     model_config = {
         "input_size": input_size,
@@ -184,6 +260,9 @@ def _save_model_config(
         "max_seq_len": None,
         "threshold": 0.5,
         "oov_token": oov_token,
+        "embedding_type": embedding_type,
+        "use_sentence_features": use_sentence_features,
+        "sentence_feature_size": sentence_feature_size,
     }
     (artifact_dir / "model_config.json").write_text(
         json.dumps(model_config),

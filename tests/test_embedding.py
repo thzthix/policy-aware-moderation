@@ -18,6 +18,18 @@ class MockWord2VecModel:
         return self.vectors[key]
 
 
+class MockFastTextModel:
+    def __init__(self) -> None:
+        self.key_to_index = {"hello": 0}
+        self.vector_size = 3
+
+    def __getitem__(self, key: str) -> np.ndarray:
+        if key == "hello":
+            return np.array([1.0, 2.0, 3.0], dtype=np.float32)
+
+        return np.array([0.5, -0.5, 1.5], dtype=np.float32)
+
+
 def test_tokens_to_sequence_vectors_returns_sequence_shape() -> None:
     model = MockWord2VecModel()
 
@@ -62,6 +74,16 @@ def test_tokens_to_sequence_vectors_returns_zero_vector_for_empty_tokens() -> No
         vectors,
         np.zeros((1, model.vector_size), dtype=np.float32),
     )
+
+
+def test_tokens_to_sequence_vectors_uses_subword_vector_without_oov_token() -> None:
+    model = MockFastTextModel()
+
+    vectors = tokens_to_sequence_vectors(["unknown"], model)
+
+    assert vectors.shape == (1, model.vector_size)
+    assert vectors.dtype == np.float32
+    np.testing.assert_array_equal(vectors[0], np.array([0.5, -0.5, 1.5], dtype=np.float32))
 
 
 def test_pad_sequence_vectors_returns_float32_batch() -> None:
