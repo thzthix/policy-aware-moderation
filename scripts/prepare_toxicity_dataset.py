@@ -20,6 +20,7 @@ JIGSAW_TOXIC_COLUMNS = (
     "insult",
     "identity_hate",
 )
+KOREAN_HATE_SPEECH_TOXIC_LABELS = {"offensive", "hate"}
 
 
 def convert_kmhas_row(row: dict[str, Any]) -> dict[str, str | int]:
@@ -51,6 +52,19 @@ def convert_jigsaw_row(row: dict[str, Any]) -> dict[str, str | int]:
     }
 
 
+def convert_korean_hate_speech_row(row: dict[str, Any]) -> dict[str, str | int]:
+    """한국어 혐오표현 데이터 행을 표준 학습 형식으로 변환한다."""
+    comment_text = _require_field(row, "comments", "Korean Hate Speech")
+    hate_label = str(_require_field(row, "hate", "Korean Hate Speech"))
+    if hate_label not in {"none", *KOREAN_HATE_SPEECH_TOXIC_LABELS}:
+        raise ValueError("Korean Hate Speech hate 라벨이 올바르지 않습니다.")
+
+    return {
+        "comment": str(comment_text),
+        "toxicity": int(hate_label in KOREAN_HATE_SPEECH_TOXIC_LABELS),
+    }
+
+
 def write_standard_csv(rows: Iterable[dict[str, str | int]], output_path: Path) -> None:
     """표준 학습 CSV를 저장한다."""
     data = pd.DataFrame(rows, columns=["comment", "toxicity"])
@@ -66,6 +80,8 @@ def main() -> None:
     args = _parse_args()
     if args.dataset == "kmhas":
         rows = _load_kmhas_rows(args.kmhas_split)
+    elif args.dataset == "korean-hate-speech":
+        rows = _load_korean_hate_speech_rows(args.korean_hate_speech_split)
     elif args.dataset == "jigsaw":
         rows = _load_jigsaw_rows(args.jigsaw_split)
     else:
@@ -83,12 +99,17 @@ def _parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--dataset",
-        choices=["kmhas", "jigsaw", "combined"],
+        choices=["kmhas", "korean-hate-speech", "jigsaw", "combined"],
         required=True,
         help="변환할 데이터셋",
     )
     parser.add_argument("--output-csv", required=True, help="저장할 CSV 파일 경로")
     parser.add_argument("--kmhas-split", default="train", help="K-MHaS split 이름")
+    parser.add_argument(
+        "--korean-hate-speech-split",
+        default="train",
+        help="Korean Hate Speech split 이름",
+    )
     parser.add_argument("--jigsaw-split", default="train", help="Jigsaw split 이름")
     return parser.parse_args()
 
@@ -104,6 +125,11 @@ def _load_jigsaw_rows(split: str) -> list[dict[str, str | int]]:
         split,
     )
     return [convert_jigsaw_row(row) for row in dataset]
+
+
+def _load_korean_hate_speech_rows(split: str) -> list[dict[str, str | int]]:
+    dataset = _load_huggingface_split("nayohan/korean-hate-speech", split)
+    return [convert_korean_hate_speech_row(row) for row in dataset]
 
 
 def _load_huggingface_split(dataset_name: str, split: str):

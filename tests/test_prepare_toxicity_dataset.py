@@ -7,6 +7,7 @@ import pytest
 
 from scripts.prepare_toxicity_dataset import (
     convert_jigsaw_row,
+    convert_korean_hate_speech_row,
     convert_kmhas_row,
     write_standard_csv,
 )
@@ -59,6 +60,31 @@ def test_convert_jigsaw_row_rejects_missing_toxic_column() -> None:
 
     with pytest.raises(ValueError, match="threat"):
         convert_jigsaw_row(row)
+
+
+def test_convert_korean_hate_speech_row_maps_none_to_non_toxic() -> None:
+    row = {"comments": "좋은 댓글", "hate": "none"}
+
+    assert convert_korean_hate_speech_row(row) == {
+        "comment": "좋은 댓글",
+        "toxicity": 0,
+    }
+
+
+def test_convert_korean_hate_speech_row_maps_offensive_to_toxic() -> None:
+    row = {"comments": "나쁜 댓글", "hate": "offensive"}
+
+    assert convert_korean_hate_speech_row(row) == {
+        "comment": "나쁜 댓글",
+        "toxicity": 1,
+    }
+
+
+def test_convert_korean_hate_speech_row_rejects_unknown_label() -> None:
+    row = {"comments": "댓글", "hate": "unknown"}
+
+    with pytest.raises(ValueError, match="올바르지 않습니다"):
+        convert_korean_hate_speech_row(row)
 
 
 def test_write_standard_csv_saves_comment_and_toxicity_columns(tmp_path: Path) -> None:
