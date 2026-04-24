@@ -46,6 +46,7 @@ Do NOT:
 * Do not leave debug print statements in final code.
 * Add docstrings only for public functions.
 * Use short Korean docstrings.
+* Use Korean messages for raised exceptions.
 * Each file must have a single responsibility.
 * Prefer composable functions (preprocess -> embed -> predict).
 * Avoid large monolithic functions.

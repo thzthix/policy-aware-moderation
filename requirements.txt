@@ -4,3 +4,6 @@ pandas
 scikit-learn
 gensim
 nltk
+pytest
+datasets<4.0
+optuna
