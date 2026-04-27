@@ -1,0 +1,146 @@
+[
+  {
+    "policy_id": "attack_001",
+    "category": "insult_or_attack",
+    "concept": "직접적인 모욕",
+    "policy_text": "특정 개인에게 모욕적 호칭이나 욕설을 직접 사용하는 표현은 공격적 발화로 본다.",
+    "severity": "medium",
+    "default_action": "review",
+    "source_reference": "meta_bullying_harassment"
+  },
+  {
+    "policy_id": "attack_002",
+    "category": "insult_or_attack",
+    "concept": "지능/능력 비하",
+    "policy_text": "특정 개인의 지능, 이해력, 판단력, 능력을 열등하다고 깎아내리는 표현은 능력 비하로 본다.",
+    "severity": "medium",
+    "default_action": "review",
+    "source_reference": "meta_bullying_harassment"
+  },
+  {
+    "policy_id": "attack_003",
+    "category": "insult_or_attack",
+    "concept": "외모 비하",
+    "policy_text": "특정 개인의 외모나 신체 특징을 근거로 깎아내리는 표현은 외모 비하로 본다.",
+    "severity": "medium",
+    "default_action": "review",
+    "source_reference": "meta_bullying_harassment"
+  },
+  {
+    "policy_id": "attack_004",
+    "category": "insult_or_attack",
+    "concept": "조롱/비꼼",
+    "policy_text": "특정 개인을 깎아내리기 위해 비웃거나 비꼬는 표현은 괴롭힘성 공격으로 본다.",
+    "severity": "low",
+    "default_action": "review",
+    "source_reference": "meta_bullying_harassment"
+  },
+  {
+    "policy_id": "hate_001",
+    "category": "hate_discrimination",
+    "concept": "집단 일반화",
+    "policy_text": "보호대상 집단 전체를 범죄적이거나 열등하다고 일반화하는 표현은 혐오 표현으로 본다.",
+    "severity": "high",
+    "default_action": "hide",
+    "source_reference": "meta_hate_speech"
+  },
+  {
+    "policy_id": "hate_002",
+    "category": "hate_discrimination",
+    "concept": "보호집단 대상 모욕",
+    "policy_text": "보호대상 집단이나 그 구성원을 멸칭이나 모욕적 호칭으로 부르는 표현은 혐오성 공격으로 본다.",
+    "severity": "high",
+    "default_action": "hide",
+    "source_reference": "meta_hate_speech"
+  },
+  {
+    "policy_id": "hate_003",
+    "category": "hate_discrimination",
+    "concept": "집단 비인간화",
+    "policy_text": "보호대상 집단을 사람으로 보지 않고 인간 이하의 존재로 비유하는 표현은 비인간화된 혐오 표현으로 본다.",
+    "severity": "high",
+    "default_action": "hide",
+    "source_reference": "meta_hate_speech"
+  },
+  {
+    "policy_id": "hate_004",
+    "category": "hate_discrimination",
+    "concept": "차별/배제 요구",
+    "policy_text": "보호대상 집단을 사회적 공간이나 권리에서 배제하거나 차별해야 한다고 요구하는 표현은 차별 선동으로 본다.",
+    "severity": "high",
+    "default_action": "hide",
+    "source_reference": "meta_hate_speech"
+  },
+  {
+    "policy_id": "violence_001",
+    "category": "threat_or_violence",
+    "concept": "직접적인 살해/상해 위협",
+    "policy_text": "특정 개인이나 집단에게 신체적 위해를 가하겠다고 예고하는 표현은 직접적 위협으로 본다.",
+    "severity": "high",
+    "default_action": "hide",
+    "source_reference": "meta_violence_incitement"
+  },
+  {
+    "policy_id": "violence_002",
+    "category": "threat_or_violence",
+    "concept": "폭력 행위 유도",
+    "policy_text": "다른 사람에게 특정 대상을 때리거나 해치라고 부추기는 표현은 폭력 선동으로 본다.",
+    "severity": "high",
+    "default_action": "hide",
+    "source_reference": "meta_violence_incitement"
+  },
+  {
+    "policy_id": "violence_003",
+    "category": "threat_or_violence",
+    "concept": "폭력 수단 암시",
+    "policy_text": "위해 수단을 언급하며 특정 대상을 해칠 의도를 드러내는 표현은 현실성 있는 위협으로 본다.",
+    "severity": "high",
+    "default_action": "hide",
+    "source_reference": "meta_violence_incitement"
+  },
+  {
+    "policy_id": "violence_004",
+    "category": "threat_or_violence",
+    "concept": "폭력 찬양",
+    "policy_text": "사람을 향한 폭력이나 심각한 상해를 칭찬하거나 응원하는 표현은 폭력 찬양으로 본다.",
+    "severity": "high",
+    "default_action": "hide",
+    "source_reference": "meta_violence_incitement"
+  },
+  {
+    "policy_id": "privacy_001",
+    "category": "privacy_or_doxxing",
+    "concept": "주소 공개",
+    "policy_text": "특정 개인의 집 주소나 거주지 식별 정보를 공개하거나 퍼뜨리는 표현은 신상 노출로 본다.",
+    "severity": "high",
+    "default_action": "hide",
+    "source_reference": "meta_privacy_violation"
+  },
+  {
+    "policy_id": "privacy_002",
+    "category": "privacy_or_doxxing",
+    "concept": "전화번호 공개",
+    "policy_text": "특정 개인의 전화번호나 연락처를 본인 동의 없이 공개하거나 공유를 유도하는 표현은 개인정보 노출로 본다.",
+    "severity": "high",
+    "default_action": "hide",
+    "source_reference": "meta_privacy_violation"
+  },
+  {
+    "policy_id": "privacy_003",
+    "category": "privacy_or_doxxing",
+    "concept": "학교/직장 공개",
+    "policy_text": "특정 개인의 학교, 직장, 근무지, 통학·출근 장소를 식별 가능하게 공개하는 표현은 위치 기반 신상 노출로 본다.",
+    "severity": "high",
+    "default_action": "hide",
+    "source_reference": "meta_privacy_violation"
+  },
+  {
+    "policy_id": "privacy_004",
+    "category": "privacy_or_doxxing",
+    "concept": "개인정보 공유 협박",
+    "policy_text": "특정 개인의 신상정보나 사적 정보를 퍼뜨리겠다고 위협하는 표현은 개인정보 협박으로 본다.",
+    "severity": "high",
+    "default_action": "hide",
+    "source_reference": "meta_privacy_violation"
+  }
+]
