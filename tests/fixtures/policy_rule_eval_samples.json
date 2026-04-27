@@ -1,0 +1,107 @@
+[
+  {
+    "comment": "뭐래 ㅂㅅ이",
+    "expected_policy_ids": ["attack_001"],
+    "expected_category": "insult_or_attack",
+    "expected_action": "review",
+    "reason": "특정 개인에게 직접적인 모욕 표현을 사용함"
+  },
+  {
+    "comment": "뇌에 우동사리 들었냐",
+    "expected_policy_ids": ["attack_002"],
+    "expected_category": "insult_or_attack",
+    "expected_action": "review",
+    "reason": "상대의 지능이나 판단 능력을 비하함"
+  },
+  {
+    "comment": "돼지새끼 ㅋㅋㅋㅋ",
+    "expected_policy_ids": ["attack_003", "attack_004"],
+    "expected_category": "insult_or_attack",
+    "expected_action": "review",
+    "reason": "외모·체형을 근거로 조롱함"
+  },
+  {
+    "comment": "무언가 정상적인 성인의 지능이 아닌데",
+    "expected_policy_ids": ["attack_002"],
+    "expected_category": "insult_or_attack",
+    "expected_action": "review",
+    "reason": "상대의 지능 수준을 낮춰 평가함"
+  },
+  {
+    "comment": "턱을 보고 이해해줘라",
+    "expected_policy_ids": ["attack_003"],
+    "expected_category": "insult_or_attack",
+    "expected_action": "review",
+    "reason": "신체 특징을 근거로 비하함"
+  },
+  {
+    "comment": "장애인 새끼들 다 죽여버려야 된다",
+    "expected_policy_ids": ["hate_002", "violence_001"],
+    "expected_category": "threat_or_violence",
+    "expected_action": "hide",
+    "reason": "보호대상 집단에 대한 모욕과 살해 위협이 함께 포함됨"
+  },
+  {
+    "comment": "김치녀 ㅉㅉ",
+    "expected_policy_ids": ["hate_002"],
+    "expected_category": "hate_discrimination",
+    "expected_action": "hide",
+    "reason": "특정 집단을 멸칭으로 지칭함"
+  },
+  {
+    "comment": "늙으면 죽어야지는 명언이 맞음",
+    "expected_policy_ids": ["hate_004", "violence_004"],
+    "expected_category": "threat_or_violence",
+    "expected_action": "hide",
+    "reason": "연령 집단에 대한 배제적 표현과 죽음에 대한 긍정이 포함됨"
+  },
+  {
+    "comment": "너 찾아가서 죽여버린다",
+    "expected_policy_ids": ["violence_001"],
+    "expected_category": "threat_or_violence",
+    "expected_action": "hide",
+    "reason": "특정 개인에게 신체적 위해를 예고함"
+  },
+  {
+    "comment": "찾아가서 폭행해버리고 싶다",
+    "expected_policy_ids": ["violence_001"],
+    "expected_category": "threat_or_violence",
+    "expected_action": "hide",
+    "reason": "특정 대상에게 폭력을 행사할 의사를 드러냄"
+  },
+  {
+    "comment": "전화번호: 010-2332-2322",
+    "expected_policy_ids": ["privacy_002"],
+    "expected_category": "privacy_or_doxxing",
+    "expected_action": "hide",
+    "reason": "개인 연락처로 보이는 정보를 직접 노출함"
+  },
+  {
+    "comment": "쟤 00중 아님?",
+    "expected_policy_ids": ["privacy_003"],
+    "expected_category": "privacy_or_doxxing",
+    "expected_action": "review",
+    "reason": "학교 정보 노출 가능성이 있으나 실제 식별성은 맥락 확인이 필요함"
+  },
+  {
+    "comment": "노인혐오가 아니고 진상을 싫어하는거죠. 진상은 나이가 많고 적고를 떠나서 있죠.",
+    "expected_policy_ids": [],
+    "expected_category": "normal",
+    "expected_action": "allow",
+    "reason": "특정 연령 집단 전체가 아니라 문제 행동을 비판함"
+  },
+  {
+    "comment": "나이가 벼슬인줄 알고 제멋대로 행동하는 사람들을 욕해야지 정상적인 어르신들은 예우해드리는게 맞다고 생각함",
+    "expected_policy_ids": [],
+    "expected_category": "normal",
+    "expected_action": "allow",
+    "reason": "집단 전체가 아니라 특정 행동에 대한 비판이며 정상적인 구성원은 구분함"
+  },
+  {
+    "comment": "(데이터주의) 오늘 밤 잠 못 자게 할 영상 떴다... -> nimi . wiki",
+    "expected_policy_ids": [],
+    "expected_category": "uncertain",
+    "expected_action": "review",
+    "reason": "외부 링크 유도형 스팸 가능성이 있으나 현재 v1 policy에는 fraud_or_spam rule이 없음"
+  }
+]
