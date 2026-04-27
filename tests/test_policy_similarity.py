@@ -155,3 +155,135 @@ def test_retrieve_top_k_returns_empty_list_for_unknown_category(monkeypatch) -> 
     )
 
     assert results == []
+
+
+def test_retrieve_top_k_returns_top_k_results_when_min_score_is_none(
+    monkeypatch,
+) -> None:
+    documents = [
+        Document(
+            page_content="특정 개인에게 모욕적 호칭이나 욕설을 직접 사용하는 표현은 공격적 발화로 본다.",
+            metadata={
+                "policy_id": "attack_001",
+                "category": "insult_or_attack",
+                "concept": "직접적인 모욕",
+                "severity": "medium",
+                "default_action": "review",
+                "source_reference": "meta_bullying_harassment",
+            },
+        ),
+        Document(
+            page_content="특정 개인의 지능, 이해력, 판단력, 능력을 열등하다고 깎아내리는 표현은 능력 비하로 본다.",
+            metadata={
+                "policy_id": "attack_002",
+                "category": "insult_or_attack",
+                "concept": "지능/능력 비하",
+                "severity": "medium",
+                "default_action": "review",
+                "source_reference": "meta_bullying_harassment",
+            },
+        ),
+    ]
+    embeddings = [
+        [1.0, 0.0],
+        [0.8, 0.2],
+    ]
+
+    monkeypatch.setattr(
+        "src.moderation.policy_similarity.embed_comment",
+        lambda text: [1.0, 0.0],
+    )
+
+    results = retrieve_top_k(
+        "뭐래 ㅂㅅ이",
+        documents,
+        embeddings,
+        category="insult_or_attack",
+        top_k=2,
+        min_score=None,
+    )
+
+    assert len(results) == 2
+
+
+def test_retrieve_top_k_filters_results_by_min_score(monkeypatch) -> None:
+    documents = [
+        Document(
+            page_content="특정 개인에게 모욕적 호칭이나 욕설을 직접 사용하는 표현은 공격적 발화로 본다.",
+            metadata={
+                "policy_id": "attack_001",
+                "category": "insult_or_attack",
+                "concept": "직접적인 모욕",
+                "severity": "medium",
+                "default_action": "review",
+                "source_reference": "meta_bullying_harassment",
+            },
+        ),
+        Document(
+            page_content="특정 개인의 지능, 이해력, 판단력, 능력을 열등하다고 깎아내리는 표현은 능력 비하로 본다.",
+            metadata={
+                "policy_id": "attack_002",
+                "category": "insult_or_attack",
+                "concept": "지능/능력 비하",
+                "severity": "medium",
+                "default_action": "review",
+                "source_reference": "meta_bullying_harassment",
+            },
+        ),
+    ]
+    embeddings = [
+        [1.0, 0.0],
+        [0.8, 0.2],
+    ]
+
+    monkeypatch.setattr(
+        "src.moderation.policy_similarity.embed_comment",
+        lambda text: [1.0, 0.0],
+    )
+
+    results = retrieve_top_k(
+        "뭐래 ㅂㅅ이",
+        documents,
+        embeddings,
+        category="insult_or_attack",
+        top_k=2,
+        min_score=0.99,
+    )
+
+    assert len(results) == 1
+    assert results[0]["policy_id"] == "attack_001"
+
+
+def test_retrieve_top_k_returns_empty_list_when_all_scores_are_below_min_score(
+    monkeypatch,
+) -> None:
+    documents = [
+        Document(
+            page_content="특정 개인에게 모욕적 호칭이나 욕설을 직접 사용하는 표현은 공격적 발화로 본다.",
+            metadata={
+                "policy_id": "attack_001",
+                "category": "insult_or_attack",
+                "concept": "직접적인 모욕",
+                "severity": "medium",
+                "default_action": "review",
+                "source_reference": "meta_bullying_harassment",
+            },
+        )
+    ]
+    embeddings = [[0.8, 0.2]]
+
+    monkeypatch.setattr(
+        "src.moderation.policy_similarity.embed_comment",
+        lambda text: [1.0, 0.0],
+    )
+
+    results = retrieve_top_k(
+        "뭐래 ㅂㅅ이",
+        documents,
+        embeddings,
+        category="insult_or_attack",
+        top_k=1,
+        min_score=0.99,
+    )
+
+    assert results == []

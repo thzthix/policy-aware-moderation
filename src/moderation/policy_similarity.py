@@ -37,6 +37,7 @@ def retrieve_top_k(
     embeddings: list[list[float]],
     category: str,
     top_k: int = 3,
+    min_score: float | None = None,
 ) -> list[dict[str, object]]:
     """댓글과 가장 유사한 정책 rule 상위 k개를 반환한다."""
     if top_k < 1:
@@ -69,4 +70,12 @@ def retrieve_top_k(
         )
 
     scored_results.sort(key=lambda item: item["score"], reverse=True)
-    return scored_results[:top_k]
+    top_results = scored_results[:top_k]
+    if min_score is None:
+        return top_results
+
+    return [
+        result
+        for result in top_results
+        if result["score"] >= min_score
+    ]
