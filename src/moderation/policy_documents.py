@@ -1,19 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from langchain_core.documents import Document
 
 from src.moderation.policy_dataset import PolicyRule
-
-try:
-    from langchain_core.documents import Document
-except ModuleNotFoundError:
-    try:
-        from langchain.schema import Document
-    except ModuleNotFoundError:
-        @dataclass
-        class Document:  # type: ignore[no-redef]
-            page_content: str
-            metadata: dict[str, str] = field(default_factory=dict)
 
 
 def build_policy_documents(rules: list[PolicyRule]) -> list[Document]:
