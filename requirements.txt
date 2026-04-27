@@ -5,5 +5,7 @@ scikit-learn
 gensim
 nltk
 pytest
+openai
+langchain-core
 datasets<4.0
 optuna
