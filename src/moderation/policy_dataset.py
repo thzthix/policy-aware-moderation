@@ -4,6 +4,25 @@ import json
 from pathlib import Path
 from typing import TypedDict
 
+POLICY_RULE_FIELDS = (
+    "policy_id",
+    "category",
+    "concept",
+    "policy_text",
+    "severity",
+    "default_action",
+    "source_reference",
+)
+
+POLICY_RULE_METADATA_FIELDS = (
+    "policy_id",
+    "category",
+    "concept",
+    "severity",
+    "default_action",
+    "source_reference",
+)
+
 
 class PolicyRule(TypedDict):
     """정책 룰 데이터를 표현한다."""
@@ -31,17 +50,8 @@ def _validate_policy_rule(raw_rule: object) -> PolicyRule:
     if not isinstance(raw_rule, dict):
         raise ValueError("정책 룰 항목은 객체여야 합니다.")
 
-    required_fields = (
-        "policy_id",
-        "category",
-        "concept",
-        "policy_text",
-        "severity",
-        "default_action",
-        "source_reference",
-    )
     validated_rule: dict[str, str] = {}
-    for field_name in required_fields:
+    for field_name in POLICY_RULE_FIELDS:
         field_value = raw_rule.get(field_name)
         if not isinstance(field_value, str) or not field_value.strip():
             raise ValueError(f"{field_name} 필드는 비어 있지 않은 문자열이어야 합니다.")
